@@ -1,0 +1,128 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+void load(void);
+void execute(void);
+void debug(void);
+void dump(void);
+void help(void);
+void assemble(void);
+void directory(void);
+void splitLine(char*, char*, char*, char*);
+
+main()
+{
+    char str[80];
+    int lenght;
+    printf("Hello, welcome to the interpreter, enter your commmand\n");
+    while(str != "exit")
+    {
+        printf("command> ");
+        fgets(str, 80, stdin);
+        lenght = strlen(str)-1;
+        //remove last character
+        if(str[lenght]=='\n')
+        {
+            str[lenght]='\0';
+        }
+        //printf("%s\n",str);
+        //printf("%d\n",lenght);
+
+        //convert to lowercase
+        int i;
+        for(i = 0; str[i]; i++)
+        {
+            str[i] = tolower(str[i]);
+        }
+        char command[10];
+        char p1[10];
+        char p2[10];
+
+        //split the string
+
+
+        if(!strcmp(str,"load")||!strcmp(str,"execute")||!strcmp(str,"debug")||!strcmp(str,"dump")||!strcmp(str,"help")||!strcmp(str,"assemble")||!strcmp(str,"directory")||!strcmp(str,"exit"))
+        {
+             if(!strcmp(str,"load"))
+            {
+                load();
+            }
+            if(!strcmp(str,"execute"))
+            {
+                execute();
+            }
+            if(!strcmp(str,"debug"))
+            {
+                debug();
+            }
+            if(!strcmp(str,"dump"))
+            {
+                dump();
+            }
+            if(!strcmp(str,"help"))
+            {
+                help();
+            }
+            if(!strcmp(str,"assemble"))
+            {
+                assemble();
+            }
+            if(!strcmp(str,"directory"))
+            {
+                directory();
+            }
+
+            if(!strcmp(str,"exit"))
+            {
+                exit(0);
+            }
+        }
+        else
+        {
+            printf("%s is not a vallid command\n", str);
+        }
+    splitLine(str, command,p1,p2);
+    //printf("I typed %s \n", p1);
+    }
+
+
+    return 0;
+
+
+}
+void load(void)
+{
+    printf("load function was reached\n");
+}
+void execute(void)
+{
+    printf("execute function was reached\n");
+}
+void debug(void)
+{
+    printf("debug function was reached\n");
+}
+void dump(void)
+{
+    printf("dumpfunction was reached\n");
+}
+void help(void)
+{
+    printf("help function was reached\n");
+}
+void assemble(void)
+{
+    printf("assemble function was reached\n");
+}
+void directory(void)
+{
+    printf("directory function was reached\n");
+}
+void splitLine(char* line, char *command, char*p1, char *p2)
+{
+     printf("in split: line = %s\n", line);     /* just for testing */
+}
+
+
