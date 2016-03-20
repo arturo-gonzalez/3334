@@ -1,3 +1,8 @@
+//Arturo Gonzalez
+//CSCI 3334
+//Phase2
+//3/../2016
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,6 +22,9 @@ void splitLine(char*, char*, char*, char*);
 
 main()
 {
+
+
+
     char str[80];
     int lenght;
     str[0] = '\0';
@@ -232,4 +240,3 @@ void splitLine(char* line, char *command, char*p1, char *p2)
 	}
 	p2[k] = '\0';
 }
-
