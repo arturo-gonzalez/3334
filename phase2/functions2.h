@@ -1,3 +1,4 @@
+
 //Arturo Gonzalez
 //CSCI 3334
 //Phase2
@@ -99,8 +100,6 @@ void pass1(char* p1)
 
     }
 
-
-
     //symbol table
     struct symtab symtab1[25];
 
@@ -116,18 +115,42 @@ void pass1(char* p1)
         exit(-1);
     }
 
-
     intermediate = fopen("intermediate.txt", "w");//clear the file
     fclose(intermediate);//close it
     fgets(line,128,fp);//get first line
     //break up line
-    readLine(line,label,opcode,operand,comment,symtab1);
-    while(!feof(fp))
+    splitLine1(line,label,opcode,operand,comment);
+    //check that the line is not a comment
+    while(line[0]=='.')
     {
         printf("%s\n",line);
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+            fclose(intermediate); //close intermediate file
+            fgets(line,128,fp);
+    }
+    splitLine1(line,label,opcode,operand,comment);
+    if(!strcmp(opcode, "START"))
+    {
+        printf("%s\n",line);
+        startingAddress = operand;
+        LOCCTR += operand;
+        intermediate = fopen("intermediate.txt", "a");//open for apend
+        fprintf(intermediate, "%s\n", line);//write line to intermediate file
+        fprintf(intermediate, "LOCCTR is %x\n",LOCCTR);
+        fclose(intermediate); //close intermediate file
         fgets(line,128,fp);
+    }
+    else
+    {
+        printf("%s\n",line);
+        LOCCTR = 0;
+        fgets(line,128,fp);
+    }
+    while(!feof(fp))
+    {
         readLine(line,label,opcode,operand,comment,symtab1);
-
+        fgets(line,128,fp);
     }
 
 }
@@ -160,18 +183,33 @@ void readLine(char* line, char *label, char*opcode, char *operand, char* comment
 
             fprintf(intermediate, "this is not the end line\n");
             fclose(intermediate); //close intermediate file
-            printf("this is not the end line");
+            printf("this is not the end line\n");
+            printf("%s\n",line);
 
             //hanlde line 1
             handleLine1(line, label, opcode, operand, comment, symtab1);
 
         }
+        else
+        {
+
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+
+            fprintf(intermediate, "this is the last end line\n");
+            fclose(intermediate); //close intermediate file
+            printf("this is the end line\n");
+            printf("%s\n",line);
+        }
+
 
     }
     else
     {
-        //print comment
-        printf("this is a comment");
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+            fprintf(intermediate, "this is a comment line\n");
+            fclose(intermediate); //close intermediate file
     }
 
 
@@ -216,9 +254,7 @@ void handleLine1(char* line, char *label, char*opcode, char *operand, char* comm
 
             }
 
-            printf(symtab1[symindex].symbol);
-
-
+            //printf(symtab1[symindex].symbol);
 
     }
 
