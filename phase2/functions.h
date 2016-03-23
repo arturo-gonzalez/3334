@@ -3,6 +3,9 @@
 //Phase2
 //3/30/2016
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 //opcode tab
 struct optab
@@ -20,9 +23,9 @@ struct symtab
 }symtab;
 
 void pass1(char*p1);
-void readLine(char*, char*, char*, char*, char*, struct symtab symtab1[25]);
+void readLine(char*, char*, char*, char*, char*, struct symtab symtab1[500]);
 void splitLine1(char*, char *, char*, char *, char*);
-void handleLine1(char*, char *, char*, char *, char*,struct symtab symtab1[25]);
+void handleLine1(char*, char *, char*, char *, char*,struct symtab symtab1[500]);
 
 char label[80];
 char opcode[80];
@@ -99,10 +102,8 @@ void pass1(char* p1)
 
     }
 
-
-
     //symbol table
-    struct symtab symtab1[25];
+    struct symtab symtab1[500];
 
     char line[128];
     //open the file
@@ -116,23 +117,54 @@ void pass1(char* p1)
         exit(-1);
     }
 
-
     intermediate = fopen("intermediate.txt", "w");//clear the file
     fclose(intermediate);//close it
-    fgets(line,128,fp);//get first line
+    fgets(line,128,fp);//get first line2
     //break up line
-    readLine(line,label,opcode,operand,comment,symtab1);
-    while(!feof(fp))
+    splitLine1(line,label,opcode,operand,comment);
+    //check that the line is not a comment
+    while(line[0]=='.')
     {
         printf("%s\n",line);
-        fgets(line,128,fp);
-        readLine(line,label,opcode,operand,comment,symtab1);
-
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+            fclose(intermediate); //close intermediate file
+            fgets(line,128,fp);
     }
+    splitLine1(line,label,opcode,operand,comment);
+    if(!strcmp(opcode, "START"))
+    {
+        int number;
+        printf("%s\n",line);
+        //change from string to number
+        number = strtol(operand, NULL, 16);
+        startingAddress = number;
+        LOCCTR = number;
+        intermediate = fopen("intermediate.txt", "a");//open for apend
+        fprintf(intermediate, "%s\n", line);//write line to intermediate file
+        fprintf(intermediate, "LOCCTR is %x\n",LOCCTR);
+        fclose(intermediate); //close intermediate file
+        fgets(line,128,fp);
+
+        //error is there is a missing or illegal derective
+    }
+    else
+    {
+        printf("%s\n",line);
+        LOCCTR = 0;
+        fgets(line,128,fp);
+    }
+    while(!feof(fp))
+    {
+        readLine(line,label,opcode,operand,comment,symtab1);
+        fgets(line,128,fp);
+    }
+
+    printf("symbol is %s\n",symtab1[3].symbol);
 
 }
 
-void readLine(char* line, char *label, char*opcode, char *operand, char* comment, struct symtab symtab1[25])
+void readLine(char* line, char *label, char*opcode, char *operand, char* comment, struct symtab symtab1[500])
 {
     if(line[0]!='.')
     {
@@ -141,13 +173,16 @@ void readLine(char* line, char *label, char*opcode, char *operand, char* comment
         //if opcode == start
         if(!strcmp(opcode, "START"))
         {
-            LOCCTR += operand;
-            startingAddress = operand;
+            int num;
+            num = strtol(operand, NULL, 16);
+            LOCCTR = num;
+            startingAddress = num;
             intermediate = fopen("intermediate.txt", "a");//open for apend
             fprintf(intermediate, "%s\n", line);//write line to intermediate file
             fprintf(intermediate, "Counter is %x\n", LOCCTR);//write locctr to intermediate file
-            fprintf(intermediate, "this is the start line\n");
             fclose(intermediate); //close intermediate file
+
+            //error is there is a missing or illegal derective
 
 
         }
@@ -158,26 +193,43 @@ void readLine(char* line, char *label, char*opcode, char *operand, char* comment
             fprintf(intermediate, "%s\n", line);//write line to intermediate file
             //fprintf(intermediate, "Counter is %s\n", LOCCTR);//write locctr to intermediate file
 
-            fprintf(intermediate, "this is not the end line\n");
             fclose(intermediate); //close intermediate file
-            printf("this is not the end line");
+            printf("%s\n",line);
+
+            //error is label is illegal
 
             //hanlde line 1
             handleLine1(line, label, opcode, operand, comment, symtab1);
 
+
+
         }
+        else
+        {
+
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+
+            fclose(intermediate); //close intermediate file
+            printf("this is the end line\n");
+            printf("%s\n",line);
+
+            //error if missing or illegal operand
+        }
+
 
     }
     else
     {
-        //print comment
-        printf("this is a comment");
+            intermediate = fopen("intermediate.txt", "a");//open for apend
+            fprintf(intermediate, "%s\n", line);//write line to intermediate file
+            fclose(intermediate); //close intermediate file
     }
 
 
 }
 
-void handleLine1(char* line, char *label, char*opcode, char *operand, char* comment, struct symtab symtab1[25])
+void handleLine1(char* line, char *label, char*opcode, char *operand, char* comment, struct symtab symtab1[500])
 {
     //if there is a symbol in the label field
     int i=0;
@@ -191,13 +243,11 @@ void handleLine1(char* line, char *label, char*opcode, char *operand, char* comm
             //check for label in symtab
             if(!strcmp(symtab1[i].symbol,label))
             {
-                printf("its in the symtab\n");
                 //error flag(duplicate label)
                 inserttoSymtab = false;
             }
             else
             {
-                printf("its not  int the symtab\n");
                 inserttoSymtab = true;
 
 
@@ -209,7 +259,6 @@ void handleLine1(char* line, char *label, char*opcode, char *operand, char* comm
     if(inserttoSymtab)
     {
             //insert(label, locctr) into symtab
-            printf("here I would insert into symtab\n");
             for(;j<sizeof(label);j++)
             {
                 symtab1[symindex].symbol[j] = label[j];
@@ -217,8 +266,6 @@ void handleLine1(char* line, char *label, char*opcode, char *operand, char* comm
             }
 
             printf(symtab1[symindex].symbol);
-
-
 
     }
 

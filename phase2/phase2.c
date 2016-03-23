@@ -1,14 +1,14 @@
 //Arturo Gonzalez
 //CSCI 3334
 //Phase2
-//3/../2016
+//3/30/2016
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "functions.h"
+#include "functions2.h"
 
 void load(void);
 void execute(void);
