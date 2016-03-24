@@ -160,7 +160,7 @@ void pass1(char* p1)
         fgets(line,128,fp);
     }
 
-    printf("symbol is %s\n",symtab1[3].symbol);
+    printf("symbol is %s\n",symtab1[0].symbol);
 
 }
 
@@ -264,8 +264,10 @@ void handleLine1(char* line, char *label, char*opcode, char *operand, char* comm
                 symtab1[symindex].symbol[j] = label[j];
 
             }
+	    printf("%s\n",symtab1[symindex].symbol);
+	    symindex++; 
 
-            printf(symtab1[symindex].symbol);
+            
 
     }
 
